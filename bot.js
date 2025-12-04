@@ -161,10 +161,10 @@ const determineProfitability = async (_routerPath, _token0Contract, _token0, _to
   // Use a MUCH smaller amount - start with 0.1% to 1% of reserves
 let minAmount = ethers.parseUnits("1000", _token0.decimals)  // 1000 WPOL  
   // Add a maximum cap based on your wallet balance
-  const maxTradeSize = ethers.parseUnits("1000", _token1.decimals)// Max 10 USDC per trade
-  if (minAmount > maxTradeSize) {
-    minAmount = maxTradeSize
-  }
+  // const maxTradeSize = ethers.parseUnits("1000", _token1.decimals)// Max 10 USDC per trade
+  // if (minAmount > maxTradeSize) {
+  //   minAmount = maxTradeSize
+  // }
 
 console.log(`Trading with amount: ${ethers.formatUnits(minAmount, _token1.decimals)} ${_token1.symbol}`)
   try {
