@@ -135,8 +135,6 @@ const determineDirection = async (_priceDifference) => {
 const determineProfitability = async (_routerPath, _token0Contract, _token0, _token1) => {
   console.log(`Determining Profitability...\n`)
 
-  // This is where you can customize your conditions on whether a profitable trade is possible...
-
   let exchangeToBuy, exchangeToSell
 
   if (await _routerPath[0].getAddress() === await uRouter.getAddress()) {
@@ -147,34 +145,31 @@ const determineProfitability = async (_routerPath, _token0Contract, _token0, _to
     exchangeToSell = "Uniswap"
   }
 
-  /**
-   * The helper file has quite a few functions that come in handy
-   * for performing specifc tasks. Below we call the getReserves()
-   * function in the helper to get the reserves of a pair.
-   */
-
   const uReserves = await getReserves(uPair)
   const sReserves = await getReserves(sPair)
 
-  let minAmount
-
-  if (uReserves[0] > sReserves[0]) {
-    minAmount = BigInt(sReserves[0]) / BigInt(2)
+  // IMPORTANT: Get the correct reserve for token1 (USDC in your case)
+  // Reserves are ordered [token0, token1] based on address sorting
+  let reserve0, reserve1
+  
+  if (_token0.address.toLowerCase() < _token1.address.toLowerCase()) {
+    reserve0 = uReserves[0] < sReserves[0] ? uReserves[1] : sReserves[1]
   } else {
-    minAmount = BigInt(uReserves[0]) / BigInt(2)
+    reserve0 = uReserves[0] < sReserves[0] ? uReserves[0] : sReserves[0]
   }
 
+  // Use a MUCH smaller amount - start with 0.1% to 1% of reserves
+  let minAmount = ethers.parseUnits("100", _token1.decimals)   // 0.1% of reserve
+  
+  // Add a maximum cap based on your wallet balance
+  const maxTradeSize = ethers.parseUnits("1000", _token1.decimals)// Max 10 USDC per trade
+  if (minAmount > maxTradeSize) {
+    minAmount = maxTradeSize
+  }
+
+console.log(`Trading with amount: ${ethers.formatUnits(minAmount, _token1.decimals)} ${_token1.symbol}`)
   try {
-
-    /**
-     * See getAmountsIn & getAmountsOut:
-     * - https://docs.uniswap.org/contracts/v2/reference/smart-contracts/library#getamountsin
-     * - https://docs.uniswap.org/contracts/v2/reference/smart-contracts/library#getamountsout
-     */
-
-    // This returns the amount of WETH needed to swap for X amount of LINK
     const estimate = await _routerPath[0].getAmountsIn(minAmount, [_token0.address, _token1.address])
-
     // This returns the amount of WETH for swapping X amount of LINK
     const result = await _routerPath[1].getAmountsOut(estimate[1], [_token1.address, _token0.address])
 
