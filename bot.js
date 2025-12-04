@@ -159,8 +159,7 @@ const determineProfitability = async (_routerPath, _token0Contract, _token0, _to
   }
 
   // Use a MUCH smaller amount - start with 0.1% to 1% of reserves
-  let minAmount = ethers.parseUnits("100", _token1.decimals)   // 0.1% of reserve
-  
+let minAmount = ethers.parseUnits("1000", _token0.decimals)  // 1000 WPOL  
   // Add a maximum cap based on your wallet balance
   const maxTradeSize = ethers.parseUnits("1000", _token1.decimals)// Max 10 USDC per trade
   if (minAmount > maxTradeSize) {
@@ -169,9 +168,11 @@ const determineProfitability = async (_routerPath, _token0Contract, _token0, _to
 
 console.log(`Trading with amount: ${ethers.formatUnits(minAmount, _token1.decimals)} ${_token1.symbol}`)
   try {
-    const estimate = await _routerPath[0].getAmountsIn(minAmount, [_token0.address, _token1.address])
-    // This returns the amount of WETH for swapping X amount of LINK
-    const result = await _routerPath[1].getAmountsOut(estimate[1], [_token1.address, _token0.address])
+    // Get how much USDC we get for minAmount of WPOL
+const estimate = await _routerPath[0].getAmountsOut(minAmount, [_token0.address, _token1.address])
+
+// Get how much WPOL we get back selling that USDC
+const result = await _routerPath[1].getAmountsOut(estimate[1], [_token1.address, _token0.address])
 
     console.log(`Estimated amount of WETH needed to buy enough LINK on ${exchangeToBuy}\t\t| ${ethers.formatUnits(estimate[0], 'ether')}`)
     console.log(`Estimated amount of WETH returned after swapping LINK on ${exchangeToSell}\t| ${ethers.formatUnits(result[1], 'ether')}\n`)
