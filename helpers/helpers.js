@@ -26,20 +26,19 @@ async function getTokenAndContract(_token0Address, _token1Address, _provider) {
     const token0Contract = new ethers.Contract(_token0Address, IERC20.abi, _provider);
     const token1Contract = new ethers.Contract(_token1Address, IERC20.abi, _provider);
 
-    // Fetch and structure token information
-    const token0 = {
-        address: _token0Address,
-        decimals: 18,
-        symbol: await token0Contract.symbol(),
-        name: await token0Contract.name()
-    }
+  const token0 = {
+    address: _token0Address,
+    decimals: await token0Contract.decimals(),  // Fetch actual decimals
+    symbol: await token0Contract.symbol(),
+    name: await token0Contract.name()
+}
 
-    const token1 = {
-        address: _token1Address,
-        decimals: 18,
-        symbol: await token1Contract.symbol(),
-        name: await token1Contract.name()
-    }
+const token1 = {
+    address: _token1Address,
+    decimals: await token1Contract.decimals(),  // Fetch actual decimals
+    symbol: await token1Contract.symbol(),
+    name: await token1Contract.name()
+}
 
     return { token0Contract, token1Contract, token0, token1 };
 }
