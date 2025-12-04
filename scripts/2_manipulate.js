@@ -31,10 +31,10 @@ async function main() {
 
   // Fetch price of LINK/WETH after the swap
   const priceAfter = await calculatePrice(pair)
-
+//Added ARB_AGAINST And ARB_FOR instead of WETH and LINK !
   const data = {
-    'Price Before': `1 WETH = ${Number(priceBefore).toFixed(0)} LINK`,
-    'Price After': `1 WETH = ${Number(priceAfter).toFixed(0)} LINK`,
+    'Price Before': `1 ${ARB_AGAINST} = ${Number(priceBefore).toFixed(0)} ${ARB_FOR}`,
+    'Price After': `1 ${ARB_AGAINST} = ${Number(priceAfter).toFixed(0)} ${ARB_FOR}`,
   }
 
   console.table(data)
